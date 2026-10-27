@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Windows Security Alert</title>
+<style>
+    body {
+        background: #000;
+        margin: 0;
+        font-family: "Segoe UI", sans-serif;
+        color: white;
+        height: 100vh;
+        overflow: hidden;
+        cursor: none;
+    }
+
+    /* START SCREEN */
+    #startScreen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: black;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        font-size: 38px;
+        z-index: 20000;
+    }
+
+    #startScreen small {
+        font-size: 20px;
+        opacity: 0.7;
+        margin-top: 10px;
+    }
+
+    /* Your existing styles below */
+    .container {
+        padding: 80px;
+    }
+
+    body.bgBlue { background: #0078d7; }
+
+    .logo { width: 120px; margin-bottom: 40px; opacity: 0.9; }
+    .sad-face { font-size: 100px; margin-bottom: 20px; }
+    .text { font-size: 28px; width: 70%; line-height: 1.4; }
+    .warning { margin-top: 20px; font-size: 26px; font-weight: bold; }
+    .critical {
+        margin-top: 20px;
+        font-size: 34px;
+        font-weight: bold;
+        color: red;
+        text-transform: uppercase;
+        animation: flash 0.6s infinite alternate;
+    }
+
+    @keyframes flash { from {opacity: 1;} to {opacity: 0.1;} }
+
+    .progress { margin-top: 30px; font-size: 32px; font-weight: bold; }
+
+    .error-code {
+        font-size: 20px;
+        margin-top: 20px;
+        animation: blink 1s infinite alternate;
+    }
+
+    @keyframes blink { from {opacity: 1;} to {opacity: 0.2;} }
+
+    .scam-box {
+        margin-top: 40px;
+        font-size: 28px;
+        border: 3px solid white;
+        padding: 20px 30px;
+        width: fit-content;
+        background: rgba(255, 0, 0, 0.25);
+    }
+
+    .fake-cursor {
+        position: fixed;
+        width: 32px;
+        height: 32px;
+        pointer-events: none;
+        background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAvUlEQVRYw+3VsQmCQBBF4Y+usSEtqgGxqgN0BBroBtqgE2gJtEAWqQHYcGQkMIGho90SXMamR/85znfuVwCVJcM9wCUPkCBxBF67REFUOHgTwk7K1pVWOQhMhcCsyhFI8m5wH8iF4nZkbC3Pl64k2xCB1Ae1q7u97YILaGJAj4jpppbQVjnr3Gvj9GTDHDSfs3OfiIIgmim8Qj2rTQ7+gtFEV1um4zGRbzf2cQAAAABJRU5ErkJggg==") no-repeat center;
+    }
+
+    #rebootScreen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: black;
+        color: white;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        z-index: 10000;
+        font-size: 32px;
+    }
+
+    #rebootLogo {
+        width: 140px;
+        margin-bottom: 40px;
+        opacity: 0;
+        transition: opacity 2.5s ease;
+    }
+
+    .spinner {
+        margin-top: 20px;
+        border: 8px solid #333;
+        border-top: 8px solid white;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin { to {transform: rotate(360deg);} }
+</style>
+</head>
+
+<body>
+
+<!-- START PRESS ANY KEY SCREEN -->
+<div id="startScreen">
+    Press any key from keyboard to continue
+    <small>View Invitation</small>
+</div>
+
+<!-- fake cursor -->
+<div class="fake-cursor" id="cursor"></div>
+
+<!-- reboot screen -->
+<div id="rebootScreen">
+    <svg id="rebootLogo" viewBox="0 0 100 100">
+        <rect x="0" y="0" width="45" height="45" fill="#ffffff"/>
+        <rect x="55" y="0" width="45" height="45" fill="#ffffff"/>
+        <rect x="0" y="55" width="45" height="45" fill="#ffffff"/>
+        <rect x="55" y="55" width="45" height="45" fill="#ffffff"/>
+    </svg>
+    Restarting…
+    <div class="spinner"></div>
+</div>
+
+<!-- BSOD PAGE -->
+<div class="container" id="bsodPage" style="display:none;">
+
+    <svg class="logo" viewBox="0 0 100 100">
+        <rect x="0" y="0" width="45" height="45" fill="#ffffff"/>
+        <rect x="55" y="0" width="45" height="45" fill="#ffffff"/>
+        <rect x="0" y="55" width="45" height="45" fill="#ffffff"/>
+        <rect x="55" y="55" width="45" height="45" fill="#ffffff"/>
+    </svg>
+
+    <div class="sad-face">:(</div>
+
+    <div class="text">
+        Your PC ran into a problem and your device is in critical condition.<br>
+        Do not use you computer or shutdow, or else your device and data will be leaked.
+    </div>
+
+    <div class="warning">Do NOT turn off your computer.</div>
+    <div class="critical">⚠ YOU COMPUTER, EMAIL & BANKING IS IN DANGER ⚠</div>
+    <div class="progress" id="progressText">0% complete</div>
+    <div class="error-code">Error: <strong>Contact our technician to solve this.</strong></div>
+
+    <div class="scam-box">
+        ⚠ Technical Support Number: 1-888-367-0802<br>
+        <small>(Contact us immediately to fix this issue)</small>
+    </div>
+</div>
+
+<script>
+/* -------------------------
+     FULLSCREEN ON KEY PRESS
+--------------------------- */
+
+function startFullscreen() {
+    const el = document.documentElement;
+
+    if (el.requestFullscreen) el.requestFullscreen().catch(()=>{});
+    document.body.classList.add("bgBlue");
+}
+
+// Wait for ANY key
+document.addEventListener("keydown", () => {
+    document.getElementById("startScreen").style.display = "none";
+    document.getElementById("bsodPage").style.display = "block";
+
+    startFullscreen();
+    startProgress();
+}, { once: true });
+
+/* -------------------------
+     MOUSE FREEZE
+--------------------------- */
+
+let freezeX = null;
+let freezeY = null;
+const cursor = document.getElementById("cursor");
+
+document.addEventListener("mousemove", e => {
+    if (freezeX === null) freezeX = e.clientX;
+    if (freezeY === null) freezeY = e.clientY;
+
+    cursor.style.left = freezeX + "px";
+    cursor.style.top = freezeY + "px";
+});
+
+/* -------------------------
+     PROGRESS SYSTEM
+--------------------------- */
+
+let progress = 0;
+const progressText = document.getElementById("progressText");
+
+function startProgress() {
+    progress = 0;
+    const interval = setInterval(() => {
+        progress++;
+        progressText.textContent = progress + "% complete";
+
+        if (progress >= 100) {
+            clearInterval(interval);
+            simulateReboot();
+        }
+    }, 80);
+}
+
+function simulateReboot() {
+    document.getElementById("bsodPage").style.display = "none";
+    const rebootScreen = document.getElementById("rebootScreen");
+    rebootScreen.style.display = "flex";
+
+    setTimeout(() => {
+        document.getElementById("rebootLogo").style.opacity = 1;
+    }, 300);
+
+    setTimeout(() => {
+        document.getElementById("rebootLogo").style.opacity = 0;
+        rebootScreen.style.display = "none";
+        document.getElementById("bsodPage").style.display = "block";
+        startProgress();
+    }, 3500);
+}
+</script>
+
+</body>
+</html>
